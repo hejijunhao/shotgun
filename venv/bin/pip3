@@ -1,4 +1,4 @@
-#!/Users/pkhelfried/CrimsonSun/shotgun/venv/bin/python3.12
+#!/Users/pkhelfried/CrimsonSun/shotgun/venv/bin/python3.11
 # -*- coding: utf-8 -*-
 import re
 import sys
