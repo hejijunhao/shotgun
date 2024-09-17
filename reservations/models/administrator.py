@@ -13,4 +13,3 @@ class Administrator:
     
     def __str__(self):
         return f"Administrator: {self.username}"
-    
