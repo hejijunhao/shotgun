@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,7 +26,7 @@ SECRET_KEY = 'django-insecure-_e#&kvu!q_s%!8_1@@*wjvh84r8(+2t%tx042-2&avr*c%*ja^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['shotgun-prod.ap-southeast-1.elasticbeanstalk.com']
 
 
 # Application definition
@@ -77,10 +78,10 @@ WSGI_APPLICATION = 'shotgun.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'shotgun-db',           # Replace with your database name
+        'NAME': 'shotgun_db_sg',           # Replace with your database name
         'USER': 'dbmasteruser',           # Replace with your PostgreSQL username
-        'PASSWORD': '^*d4R{>|nFVa(V0CC#|b:]LwJ&_N,0v7',   # Replace with your PostgreSQL password
-        'HOST': 'ls-3fb6d1a592ae8c77811b509d438b440e57374c14.cn4ou6seobf9.us-east-1.rds.amazonaws.com',  # Replace with your AWS Lightsail database endpoint
+        'PASSWORD': 'nimCwJ94l(Il>%5lZGkj]4Bj2cgZ9U&>',   # Replace with your PostgreSQL password
+        'HOST': 'ls-8719f59ded0f1c3d7cd00c963d434ec2fc6c24aa.c92cs2gqcb2m.ap-southeast-1.rds.amazonaws.com',  # Replace with your AWS Lightsail database endpoint
         'PORT': '5432',                   # Default PostgreSQL port
     }
 }
@@ -120,7 +121,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
