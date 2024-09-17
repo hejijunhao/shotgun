@@ -78,14 +78,13 @@ WSGI_APPLICATION = 'shotgun.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'shotgun_db_sg',           # Replace with your database name
-        'USER': 'dbmasteruser',           # Replace with your PostgreSQL username
-        'PASSWORD': 'nimCwJ94l(Il>%5lZGkj]4Bj2cgZ9U&>',   # Replace with your PostgreSQL password
-        'HOST': 'ls-8719f59ded0f1c3d7cd00c963d434ec2fc6c24aa.c92cs2gqcb2m.ap-southeast-1.rds.amazonaws.com',  # Replace with your AWS Lightsail database endpoint
+        'NAME': 'ebdb',           # Replace with your database name
+        'USER': 'superadmin',           # Replace with your PostgreSQL username
+        'PASSWORD': 'H3!neken',   # Replace with your PostgreSQL password
+        'HOST': 'awseb-e-rc95fneux4-stack-awsebrdsdatabase-60vk4cl42xdn.cbuigee0045c.ap-southeast-1.rds.amazonaws.com',  # Replace with your AWS Lightsail database endpoint
         'PORT': '5432',                   # Default PostgreSQL port
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

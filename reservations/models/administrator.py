@@ -1,4 +1,4 @@
-from werkzeug.security import generate_password_hash, check_password_hash
+from django.contrib.auth.hashers import make_password, check_password
 
 class Administrator:
     def __init__(self, username, password):
@@ -6,10 +6,11 @@ class Administrator:
         self.set_password(password)
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+        self.password_hash = make_password(password)
 
     def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
+        return check_password(self.password_hash, password)
+    
     def __str__(self):
         return f"Administrator: {self.username}"
+    

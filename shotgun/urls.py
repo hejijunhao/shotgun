@@ -1,4 +1,3 @@
-# shotgun/urls.py
 from django.contrib import admin
 from django.urls import path, include  # Import 'include' to link to app-level URLs
 

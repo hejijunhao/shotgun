@@ -1,4 +1,4 @@
-from models import Restaurant, Table, Administrator, Guest, OpeningSchedule, Reservation, MergedTable
+from reservations.models import Restaurant, Table, Administrator, Guest, OpeningSchedule, Reservation, MergedTable
 from datetime import datetime, timedelta
 
 
