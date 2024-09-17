@@ -1,7 +1,9 @@
 asgiref==3.8.1
 Django==5.1.1
-sqlparse==0.5.1
+django-environ==0.10.0
+gunicorn==20.1.0
+MarkupSafe==2.1.5
+Pillow==10.0.0
 psycopg2-binary==2.9.7
-gunicorn==20.1.0     # For WSGI server in production
-django-environ==0.10.0   # Environment management
-Pillow==10.0.0       # Image processing
+sqlparse==0.5.1
+Werkzeug==3.0.4

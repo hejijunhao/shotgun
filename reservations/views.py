@@ -14,3 +14,7 @@ def create_reservation(request):
 def reservation_detail(request, pk):
     # Add logic to show reservation details
     return render(request, 'reservations/reservation_detail.html')
+
+def index(request):
+    # The equivalent of Flask's index view
+    return render(request, 'index.html', {'title': 'Home'})
