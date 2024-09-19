@@ -1,4 +1,7 @@
-class MergedTable:
+from django.db import models
+
+
+class MergedTable(models.Model):
     def __init__(self, table1, table2):
         self.table1 = table1
         self.table2 = table2

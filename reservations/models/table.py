@@ -1,4 +1,6 @@
-class Table:
+from django.db import models
+
+class Table(models.Model):
     all_tables = {}  # Class variable to store all table instances
 
     def __init__(self, id, capacity, mergable=False):

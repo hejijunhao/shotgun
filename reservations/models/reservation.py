@@ -1,5 +1,5 @@
+from django.db import models
 from datetime import datetime, timedelta
-import uuid
 
 class Reservation:
     def __init__(self, guest, party_size, start_datetime, tables, duration=timedelta(hours=2)):

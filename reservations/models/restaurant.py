@@ -1,5 +1,4 @@
-# models/restaurant.py
-
+from django.db import models
 from .opening_schedule import OpeningSchedule
 
 class Restaurant:
