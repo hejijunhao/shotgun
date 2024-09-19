@@ -1,6 +1,7 @@
-import re
+from django.db import models
 
-class Guest:
+
+class Guest(models.Model):
     def __init__(self, name, phone, email):
         self.name = name
         self.set_phone(phone)
