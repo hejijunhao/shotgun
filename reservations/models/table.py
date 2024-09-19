@@ -1,5 +1,3 @@
-# models/table.py
-
 class Table:
     all_tables = {}  # Class variable to store all table instances
 
