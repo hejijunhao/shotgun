@@ -1,19 +1,8 @@
 import uuid
 from datetime import timedelta
 from django.db import models
-
-class Guest(models.Model):
-    name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.name
-
-class Table(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    table_number = models.CharField(max_length=10)
-
-    def __str__(self):
-        return self.table_number
+from .guest import Guest
+from .table import Table
 
 class Reservation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
