@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Table, Restaurant, OpeningSchedule, MergedTable, Reservation, Guest, Administrator
+from .models import Table, Restaurant, OpeningSchedule, Reservation, Guest, Administrator
 
 # admin.site.register(Table)
 # admin.site.register(Restaurant)
