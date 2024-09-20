@@ -4,4 +4,3 @@ from .administrator import Administrator
 from .guest import Guest
 from .opening_schedule import OpeningSchedule
 from .reservation import Reservation
-from .merged_table import MergedTable
