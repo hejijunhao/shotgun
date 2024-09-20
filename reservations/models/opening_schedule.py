@@ -1,42 +1,30 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 from datetime import time
 
-class OpeningSchedule:
-    def __init__(self):
-        self.schedule = {
-            'Monday': [], 'Tuesday': [], 'Wednesday': [], 'Thursday': [],
-            'Friday': [], 'Saturday': [], 'Sunday': []
-        }
+class OpeningSchedule(models.Model):
+    DAYS_OF_WEEK = [
+        ('Monday', 'Monday'),
+        ('Tuesday', 'Tuesday'),
+        ('Wednesday', 'Wednesday'),
+        ('Thursday', 'Thursday'),
+        ('Friday', 'Friday'),
+        ('Saturday', 'Saturday'),
+        ('Sunday', 'Sunday'),
+    ]
+    restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE, related_name='opening_schedules')
+    day = models.CharField(max_length=10, choices=DAYS_OF_WEEK)
+    sessions = ArrayField(ArrayField(models.TimeField(), size=2), default=list, blank=True)
 
-    def add_session(self, day, open_time, close_time):
+    def add_session(self, open_time, close_time):
         if isinstance(open_time, str):
             open_time = time.fromisoformat(open_time)
         if isinstance(close_time, str):
             close_time = time.fromisoformat(close_time)
         
-        self.schedule[day].append((open_time, close_time))
-        self.schedule[day].sort(key=lambda x: x[0])  # Sort sessions by start time
-
-    def get_sessions(self, day):
-        return self.schedule[day]
-
-    def is_open(self, day, check_time):
-        if isinstance(check_time, str):
-            check_time = time.fromisoformat(check_time)
-        
-        for open_time, close_time in self.schedule[day]:
-            if open_time <= check_time < close_time:
-                return True
-        return False
+        self.sessions.append([open_time, close_time])
+        self.sessions.sort(key=lambda x: x[0])
+        self.save()
 
     def __str__(self):
-        schedule_str = ""
-        for day, sessions in self.schedule.items():
-            schedule_str += f"{day}: "
-            if sessions:
-                schedule_str += ", ".join([f"{open_time.strftime('%I:%M %p')} - {close_time.strftime('%I:%M %p')}" 
-                                           for open_time, close_time in sessions])
-            else:
-                schedule_str += "Closed"
-            schedule_str += "\n"
-        return schedule_str
+        return f"{self.day}: " + ", ".join([f"{open_time.strftime('%H:%M')} - {close_time.strftime('%H:%M')}" for open_time, close_time in self.sessions])
