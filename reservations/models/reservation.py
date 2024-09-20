@@ -1,8 +1,8 @@
-import uuid
-from datetime import timedelta
 from django.db import models
+from datetime import timedelta
 from .guest import Guest
 from .table import Table
+import uuid
 
 class Reservation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
