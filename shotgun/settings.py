@@ -125,10 +125,9 @@ STATIC_URL = '/static/'
 # This is where all static files will be collected when you run `collectstatic`
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Ensure that static file directories are correctly defined
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
+# STATICFILES_DIRS = [
+#    os.path.join(BASE_DIR, 'static'),
+#]
 
 
 # Default primary key field type
