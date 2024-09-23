@@ -27,10 +27,6 @@ class OpeningSchedule(models.Model):
         if not self.active and sessions_count > 0:
             raise ValidationError('Inactive days should not have any sessions.')
 
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        super().save(*args, **kwargs)
-
     def __str__(self):
         sessions_str = ", ".join([str(session) for session in self.sessions.all()])
         return f"{self.day}: {sessions_str if sessions_str else 'No sessions'}"
