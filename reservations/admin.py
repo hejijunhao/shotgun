@@ -3,10 +3,10 @@ from .models import Table, Restaurant, OpeningSchedule, Reservation, Guest, Admi
 
 admin.site.register(Table)
 admin.site.register(Restaurant)
-admin.site.register(OpeningSchedule)
 admin.site.register(Reservation)
 admin.site.register(Administrator)
 admin.site.register(Guest)
+# admin.site.register(OpeningSchedule)  # Removed to prevent duplicate registration
 
 class SessionInline(admin.TabularInline):
     model = Session

@@ -4,3 +4,4 @@ from .administrator import Administrator
 from .guest import Guest
 from .opening_schedule import OpeningSchedule
 from .reservation import Reservation
+from .session import Session
