@@ -2,6 +2,7 @@ from django.db import models
 from datetime import timedelta
 from .guest import Guest
 from .table import Table
+from django.core.exceptions import ValidationError
 import uuid
 
 class Reservation(models.Model):
@@ -9,7 +10,7 @@ class Reservation(models.Model):
     guest = models.ForeignKey(Guest, on_delete=models.CASCADE, related_name='reservations')
     party_size = models.IntegerField()
     start_datetime = models.DateTimeField()
-    end_datetime = models.DateTimeField()
+    end_datetime = models.DateTimeField(editable=False)
     tables = models.ManyToManyField(Table)
     duration = models.DurationField(default=timedelta(hours=2))
 
@@ -41,3 +42,11 @@ class Reservation(models.Model):
             'end_datetime': self.end_datetime.strftime('%Y-%m-%d %H:%M'),
             'tables': [str(table.id) for table in self.tables.all()]
         }
+
+    def save(self, *args, **kwargs):
+        self.end_datetime = self.start_datetime + self.duration
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        if self.duration.total_seconds() <= 0:
+            raise ValidationError('Duration must be a positive value.')
