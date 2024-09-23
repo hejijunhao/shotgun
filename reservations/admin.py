@@ -22,5 +22,5 @@ class ReservationAdmin(admin.ModelAdmin):
     list_editable = ('duration',)
 
     def get_tables(self, obj):
-        return ", ".join([str(table.table_number) for table in obj.tables.all()])
+        return ", ".join([table.get_merged_identifier() for table in obj.tables.all()])
     get_tables.short_description = 'Tables'
