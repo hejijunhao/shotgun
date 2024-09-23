@@ -2,7 +2,7 @@ from django.db import models
 
 class Table(models.Model):
     restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE, related_name='tables')
-    number = models.CharField(max_length=5)  # Use CharField to allow labels like 'A', 'B', etc.
+    number = models.CharField(max_length=5)
     capacity = models.IntegerField()
     mergable = models.BooleanField(default=False)
     merged_with = models.ManyToManyField('self', blank=True, symmetrical=True)

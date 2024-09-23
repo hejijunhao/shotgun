@@ -28,10 +28,12 @@ class Reservation(models.Model):
         self.tables.set(new_tables)
 
     def __str__(self):
-        table_info = ', '.join([str(table.table_number) for table in self.tables.all()])
-        return f"Reservation {self.id}: {self.guest.name}, Party of {self.party_size}, " \
-               f"Table(s) {table_info}, {self.start_datetime.strftime('%Y-%m-%d %H:%M')} - " \
-               f"{self.end_datetime.strftime('%H:%M')}"
+        table_info = ', '.join([table.get_merged_identifier() for table in self.tables.all()])
+        return (
+            f"Reservation {self.id}: {self.guest.name}, Party of {self.party_size}, "
+            f"{table_info}, {self.start_datetime.strftime('%Y-%m-%d %H:%M')} - "
+            f"{self.end_datetime.strftime('%H:%M')}"
+        )
 
     def to_dict(self):
         return {
