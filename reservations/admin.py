@@ -1,5 +1,6 @@
 from django.contrib import admin, messages
 from .models import Table, Restaurant, OpeningSchedule, Reservation, Guest, Administrator, Session
+from .forms import ReservationForm
 
 admin.site.register(Table)
 admin.site.register(Restaurant)
@@ -16,6 +17,7 @@ class OpeningScheduleAdmin(admin.ModelAdmin):
 
 @admin.register(Reservation)
 class ReservationAdmin(admin.ModelAdmin):
+    form = ReservationForm  # Use the custom form
     list_display = ('guest', 'party_size', 'start_datetime', 'end_datetime', 'duration', 'get_tables')
     readonly_fields = ('end_datetime',)
     fields = ('guest', 'party_size', 'start_datetime', 'duration', 'end_datetime', 'tables')
@@ -25,7 +27,7 @@ class ReservationAdmin(admin.ModelAdmin):
     get_tables.short_description = 'Tables'
 
     def save_model(self, request, obj, form, change):
-        obj.save()
+        super().save_model(request, obj, form, change)
         if getattr(obj, 'max_capacity_utilized', False):
             self.message_user(
                 request,
