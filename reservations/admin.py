@@ -16,7 +16,7 @@ class OpeningScheduleAdmin(admin.ModelAdmin):
 
 @admin.register(Reservation)
 class ReservationAdmin(admin.ModelAdmin):
-    list_display = ('guest', 'party_size', 'start_datetime', 'end_datetime', 'duration', 'get_tables')
+    list_display = ('guest', 'party_size', 'start_datetime', 'duration', 'get_tables')
     readonly_fields = ('end_datetime',)
     fields = ('guest', 'party_size', 'start_datetime', 'duration', 'end_datetime', 'tables')
     list_editable = ('duration',)
