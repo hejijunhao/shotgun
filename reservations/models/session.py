@@ -1,8 +1,8 @@
 from django.db import models
 
 class Session(models.Model):
-    opening_schedule = models.ForeignKey(
-        'OpeningSchedule',
+    restaurant = models.ForeignKey(
+        'Restaurant',
         on_delete=models.CASCADE,
         related_name='sessions'
     )
