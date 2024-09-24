@@ -5,12 +5,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shotgun</title>
+    <!-- Main styles for the calendar -->
     <link rel="stylesheet" href="{% static 'reservations/styles.css' %}">
+    <!-- Header-specific styles -->
+    <link rel="stylesheet" href="{% static 'reservations/header_styles.css' %}">
 </head>
 <body>
-<div class="container">
-    <h1 class="text-3xl font-light mb-6 text-center">Shotgun</h1>
 
+<!-- Header Section -->
+<div class="header-container">
+    <!-- Thumbnail / Icon (Optional) -->
+    <div class="header-thumbnail">
+        <img src="{% static 'reservations/logo.png' %}" alt="Logo" class="header-logo">
+    </div>
+
+    <!-- Title and Subtext -->
+    <div class="header-content">
+        <h1 class="header-title">Shotgun Calendar</h1>
+        <p class="header-subtext">Manage your restaurant reservations efficiently</p>
+    </div>
+
+    <!-- Action Buttons (Optional) -->
+    <div class="header-actions">
+        <button class="primary-action">Add Reservation</button>
+        <button class="secondary-action">Settings</button>
+    </div>
+</div>
+
+<!-- Main Content Section (Calendar) -->
+<div class="container">
     <div class="text-center mb-6">
         <!-- Left Arrow -->
         <button id="prevDay" class="arrow" style="cursor: pointer;">&#9664;</button>
