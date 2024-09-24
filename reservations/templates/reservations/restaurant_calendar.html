@@ -1,21 +1,31 @@
-<!-- reservations/templates/reservations/restaurant_calendar.html -->
-
 {% load static %}
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Restaurant Reservations</title>
+    <title>Shotgun</title>
     <link rel="stylesheet" href="{% static 'reservations/styles.css' %}">
 </head>
 <body>
 <div class="container">
-    <h1 class="text-3xl font-light mb-6 text-center">Restaurant Reservations</h1>
+    <h1 class="text-3xl font-light mb-6 text-center">Shotgun</h1>
 
-    <!-- Date Picker Form -->
-    <form method="get" action="{% url 'restaurant_calendar' %}" class="mb-4 text-center">
-        <label for="date">Select Date:</label>
-        <input type="date" id="date" name="date" value="{{ selected_date }}">
-        <button type="submit">Go</button>
+    <!-- Subheading with Arrows and Date -->
+    <div class="flex justify-center items-center mb-4">
+        <!-- Left Arrow -->
+        <button id="prevDay" class="text-2xl px-4">&larr;</button>
+
+        <!-- Subheading with Dynamic Date -->
+        <h2 class="text-xl font-medium mx-4 cursor-pointer" id="subHeadingDate">
+            Schedule for {{ selected_date|date:"d. F Y" }}
+        </h2>
+
+        <!-- Right Arrow -->
+        <button id="nextDay" class="text-2xl px-4">&rarr;</button>
+    </div>
+
+    <!-- Hidden Date Picker Form (linked to the subheading) -->
+    <form id="datePickerForm" method="get" action="{% url 'restaurant_calendar' %}" style="display: none;">
+        <input type="date" id="datePickerInput" name="date" value="{{ selected_date }}">
     </form>
 
     <div class="grid" id="calendarGrid">
@@ -35,12 +45,10 @@
 </div>
 
 <script>
-    // Data from the view
-    const tables = JSON.parse(document.getElementById('tables-data').textContent);
-    const timeSlots = JSON.parse(document.getElementById('time-slots-data').textContent);
-    const reservations = JSON.parse(document.getElementById('reservations-data').textContent);
+    const tables = {{ tables|safe }};
+    const timeSlots = {{ time_slots|safe }};
+    const reservations = {{ reservations|safe }};
 
-    // JavaScript code to build the calendar grid
     const calendarGrid = document.getElementById('calendarGrid');
 
     // Build grid-template-columns dynamically
@@ -54,30 +62,29 @@
     tables.forEach(table => {
         const tableHeader = document.createElement('div');
         tableHeader.classList.add('text-center', 'font-medium', 'py-2');
-        tableHeader.textContent = table.number;
+        tableHeader.textContent = `Table ${table.number}`;
         calendarGrid.appendChild(tableHeader);
     });
 
     // Time Slots and Cells
     timeSlots.forEach(timeStr => {
-        const time = new Date(timeStr);
         const timeCell = document.createElement('div');
         timeCell.classList.add('sticky', 'left-0', 'bg-gray-100', 'pr-2', 'text-right', 'text-sm', 'py-2');
-        timeCell.textContent = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        timeCell.textContent = timeStr;
         calendarGrid.appendChild(timeCell);
 
         tables.forEach(table => {
             const cell = document.createElement('div');
             cell.classList.add('border', 'border-gray-200', 'bg-white');
-            const reservation = getReservationForSlot(table.number, time);
+            const reservation = getReservationForSlot(table.number, timeStr);
 
             if (reservation) {
                 cell.classList.add('bg-blue-100');
-                if (isSameMinute(new Date(reservation.start_datetime), time)) {
+                if (isSameMinute(new Date(reservation.start_datetime), timeStr)) {
                     cell.classList.add('rounded-t-md');
                     const resName = document.createElement('div');
                     resName.classList.add('text-xs', 'p-1', 'truncate');
-                    resName.textContent = reservation.guest_name;
+                    resName.textContent = reservation.guest__name;
                     cell.appendChild(resName);
                 }
                 cell.addEventListener('click', () => showReservationDetails(reservation.id));
@@ -88,22 +95,21 @@
     });
 
     function getReservationForSlot(tableNumber, time) {
-        return reservations.find(res =>
-            res.tables.includes(tableNumber) &&
-            time >= new Date(res.start_datetime) &&
-            time < new Date(res.end_datetime)
+        return reservations.find(res => 
+            res.tables__number == tableNumber && 
+            time === new Date(res.start_datetime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
         );
     }
 
-    function isSameMinute(date1, date2) {
-        return date1.getTime() === date2.getTime();
+    function isSameMinute(date1, timeStr) {
+        return date1.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) === timeStr;
     }
 
     function showReservationDetails(resId) {
         const reservation = reservations.find(res => res.id === resId);
         if (reservation) {
-            document.getElementById('resName').textContent = reservation.guest_name;
-            document.getElementById('resTables').textContent = reservation.tables.join(', ');
+            document.getElementById('resName').textContent = reservation.guest__name;
+            document.getElementById('resTables').textContent = reservation.tables__number;
             const startTime = new Date(reservation.start_datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             const endTime = new Date(reservation.end_datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             document.getElementById('resTime').textContent = `${startTime} - ${endTime}`;
@@ -115,13 +121,38 @@
         document.getElementById('reservationModal').style.display = 'none';
     }
 
-    // Close the modal when clicking outside of it
-    window.onclick = function(event) {
-        const modal = document.getElementById('reservationModal');
-        if (event.target == modal) {
-            modal.style.display = 'none';
-        }
+    // Get references to important elements
+    const subHeadingDate = document.getElementById('subHeadingDate');
+    const prevDayButton = document.getElementById('prevDay');
+    const nextDayButton = document.getElementById('nextDay');
+    const datePickerInput = document.getElementById('datePickerInput');
+    const datePickerForm = document.getElementById('datePickerForm');
+
+    // Function to format date as YYYY-MM-DD
+    function formatDate(date) {
+        return date.toISOString().split('T')[0];
     }
+
+    // Event handler for left/right arrows
+    function changeDate(daysToAdd) {
+        const currentDate = new Date(datePickerInput.value);
+        currentDate.setDate(currentDate.getDate() + daysToAdd); // Move days
+        datePickerInput.value = formatDate(currentDate); // Update hidden input
+        datePickerForm.submit(); // Submit form
+    }
+
+    // Left arrow (previous day)
+    prevDayButton.addEventListener('click', () => changeDate(-1));
+
+    // Right arrow (next day)
+    nextDayButton.addEventListener('click', () => changeDate(1));
+
+    // Click on subheading to open date picker
+    subHeadingDate.addEventListener('click', () => datePickerInput.click());
+
+    // When a new date is selected from the date picker, submit the form
+    datePickerInput.addEventListener('change', () => datePickerForm.submit());
+
 </script>
 </body>
 </html>
