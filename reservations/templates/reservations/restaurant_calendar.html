@@ -44,112 +44,118 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const tables = {{ tables|safe }};
-        const timeSlots = {{ time_slots|safe }};
-        const reservations = {{ reservations|safe }};
-        const selectedDate = new Date("{{ selected_date }}");
+    const tables = {{ tables|safe }};
+    const timeSlots = {{ time_slots|safe }};
+    const reservations = {{ reservations|safe }};
+    const selectedDate = new Date("{{ selected_date }}");
 
-        const calendarGrid = document.getElementById('calendarGrid');
-        const prevDayButton = document.getElementById('prevDay');
-        const nextDayButton = document.getElementById('nextDay');
-        const dateSpan = document.getElementById('subheading-date');
-        const datePickerForm = document.getElementById('datePickerForm');
+    const calendarGrid = document.getElementById('calendarGrid');
+    const prevDayButton = document.getElementById('prevDay');
+    const nextDayButton = document.getElementById('nextDay');
+    const dateSpan = document.getElementById('subheading-date');
+    const datePickerForm = document.getElementById('datePickerForm');
 
-        // Debugging output to check if elements exist
-        console.log(prevDayButton, nextDayButton, dateSpan);
+    // Centralize the date and arrows horizontally
+    document.querySelector('.text-center').style.display = 'flex';
+    document.querySelector('.text-center').style.justifyContent = 'center';
+    document.querySelector('.text-center').style.alignItems = 'center';
+    document.querySelector('.text-center').style.gap = '20px';
 
-        // Event listeners to change the date
-        prevDayButton.addEventListener('click', () => changeDate(-1));
-        nextDayButton.addEventListener('click', () => changeDate(1));
+    // Event listeners to change the date
+    prevDayButton.addEventListener('click', () => changeDate(-1));
+    nextDayButton.addEventListener('click', () => changeDate(1));
 
-        // Make the date clickable to open the calendar date picker
-        dateSpan.addEventListener('click', () => {
-            datePickerForm.style.display = 'block';
-        });
-
-        // Function to change the date
-        function changeDate(days) {
-            // Clone the current selectedDate
-            const newDate = new Date(selectedDate);
-            // Adjust the date
-            newDate.setDate(newDate.getDate() + days);
-            // Format the date in YYYY-MM-DD format
-            const formattedDate = newDate.toISOString().split('T')[0];
-            // Reload the page with the new date
-            window.location.href = `?date=${formattedDate}`;
-        }
-
-        // Populating the calendar grid
-        calendarGrid.style.gridTemplateColumns = `auto repeat(${tables.length}, 1fr)`;
-
-        // Table Headers
-        const emptyHeader = document.createElement('div');
-        emptyHeader.classList.add('sticky', 'left-0', 'bg-gray-100');
-        calendarGrid.appendChild(emptyHeader);
-
-        tables.forEach(table => {
-            const tableHeader = document.createElement('div');
-            tableHeader.classList.add('text-center', 'font-medium', 'py-2');
-            tableHeader.textContent = `Table ${table.number}`;
-            calendarGrid.appendChild(tableHeader);
-        });
-
-        // Time Slots and Cells
-        timeSlots.forEach(timeStr => {
-            const timeCell = document.createElement('div');
-            timeCell.classList.add('sticky', 'left-0', 'bg-gray-100', 'pr-2', 'text-right', 'text-sm', 'py-2');
-            timeCell.textContent = timeStr;
-            calendarGrid.appendChild(timeCell);
-
-            tables.forEach(table => {
-                const cell = document.createElement('div');
-                cell.classList.add('border', 'border-gray-200', 'bg-white');
-                const reservation = getReservationForSlot(table.number, timeStr);
-
-                if (reservation) {
-                    cell.classList.add('bg-blue-100');
-                    if (isSameMinute(new Date(reservation.start_datetime), timeStr)) {
-                        cell.classList.add('rounded-t-md');
-                        const resName = document.createElement('div');
-                        resName.classList.add('text-xs', 'p-1', 'truncate');
-                        resName.textContent = reservation.guest__name;
-                        cell.appendChild(resName);
-                    }
-                    cell.addEventListener('click', () => showReservationDetails(reservation.id));
-                }
-
-                calendarGrid.appendChild(cell);
-            });
-        });
-
-        function getReservationForSlot(tableNumber, time) {
-            return reservations.find(res =>
-                res.tables__number == tableNumber &&
-                time === new Date(res.start_datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            );
-        }
-
-        function isSameMinute(date1, timeStr) {
-            return date1.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) === timeStr;
-        }
-
-        function showReservationDetails(resId) {
-            const reservation = reservations.find(res => res.id === resId);
-            if (reservation) {
-                document.getElementById('resName').textContent = reservation.guest__name;
-                document.getElementById('resTables').textContent = reservation.tables__number;
-                const startTime = new Date(reservation.start_datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                const endTime = new Date(reservation.end_datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                document.getElementById('resTime').textContent = `${startTime} - ${endTime}`;
-                document.getElementById('reservationModal').style.display = 'block';
-            }
-        }
-
-        function closeModal() {
-            document.getElementById('reservationModal').style.display = 'none';
-        }
+    // Make the date clickable to open the calendar date picker
+    dateSpan.addEventListener('click', () => {
+        datePickerForm.style.display = 'block';
     });
+
+    // Function to change the date
+    function changeDate(days) {
+        const newDate = new Date(selectedDate);
+        newDate.setDate(newDate.getDate() + days);
+        const formattedDate = newDate.toISOString().split('T')[0];
+        window.location.href = `?date=${formattedDate}`;
+    }
+
+    // Populating the calendar grid
+    calendarGrid.style.gridTemplateColumns = `auto repeat(${tables.length}, 1fr)`;
+
+    // Table Headers
+    const emptyHeader = document.createElement('div');
+    emptyHeader.classList.add('sticky', 'left-0', 'bg-gray-100');
+    calendarGrid.appendChild(emptyHeader);
+
+    tables.forEach(table => {
+        const tableHeader = document.createElement('div');
+        tableHeader.classList.add('text-center', 'font-medium', 'py-2');
+        tableHeader.textContent = `Table ${table.number}`;
+        calendarGrid.appendChild(tableHeader);
+    });
+
+    // Time Slots and Cells
+    timeSlots.forEach(timeStr => {
+        const time = new Date(`1970-01-01T${timeStr}:00`);
+
+        // Only display the time label for full-hour times
+        const timeCell = document.createElement('div');
+        if (time.getMinutes() === 0) {
+            timeCell.classList.add('sticky', 'left-0', 'bg-gray-100', 'pr-2', 'text-right', 'text-sm', 'py-2', 'time-cell');
+            timeCell.textContent = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } else {
+            // Create an empty cell for half-hour intervals (no label, but same height)
+            timeCell.classList.add('sticky', 'left-0', 'bg-gray-100', 'pr-2', 'text-sm', 'py-2', 'empty-time-cell');
+        }
+        calendarGrid.appendChild(timeCell);
+
+        // Populate table cells for each time slot
+        tables.forEach(table => {
+            const cell = document.createElement('div');
+            cell.classList.add('border', 'border-gray-200', 'bg-white');
+            const reservation = getReservationForSlot(table.number, timeStr);
+
+            if (reservation) {
+                cell.classList.add('bg-blue-100');
+                if (isSameMinute(new Date(reservation.start_datetime), timeStr)) {
+                    cell.classList.add('rounded-t-md');
+                    const resName = document.createElement('div');
+                    resName.classList.add('text-xs', 'p-1', 'truncate');
+                    resName.textContent = reservation.guest__name;
+                    cell.appendChild(resName);
+                }
+                cell.addEventListener('click', () => showReservationDetails(reservation.id));
+            }
+
+            calendarGrid.appendChild(cell);
+        });
+    });
+
+    function getReservationForSlot(tableNumber, time) {
+        return reservations.find(res =>
+            res.tables__number == tableNumber &&
+            time === new Date(res.start_datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        );
+    }
+
+    function isSameMinute(date1, timeStr) {
+        return date1.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) === timeStr;
+    }
+
+    function showReservationDetails(resId) {
+        const reservation = reservations.find(res => res.id === resId);
+        if (reservation) {
+            document.getElementById('resName').textContent = reservation.guest__name;
+            document.getElementById('resTables').textContent = reservation.tables__number;
+            const startTime = new Date(reservation.start_datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const endTime = new Date(reservation.end_datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('resTime').textContent = `${startTime} - ${endTime}`;
+            document.getElementById('reservationModal').style.display = 'block';
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('reservationModal').style.display = 'none';
+    }
 </script>
 
 </body>

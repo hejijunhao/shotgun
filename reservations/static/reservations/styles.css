@@ -101,3 +101,16 @@
     color: #000;
     text-decoration: none;
 }
+
+.sticky, .empty-time-cell, .time-cell {
+    height: 25px; /* Ensures all cells have the same height */
+}
+
+.time-cell {
+    text-align: right;
+    padding-right: 10px;
+}
+
+.empty-time-cell {
+    visibility: hidden; /* Ensures empty cells take up space but are invisible */
+}
