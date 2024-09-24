@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'corsheaders',  # For handling CORS
     'reservations',
 ]
 
@@ -48,7 +50,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'shotgun.urls'
 
@@ -121,6 +126,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # This is where all static files will be collected when you run `collectstatic`
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
@@ -128,7 +134,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # STATICFILES_DIRS = [
 #    os.path.join(BASE_DIR, 'static'),
 #]
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

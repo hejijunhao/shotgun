@@ -1,0 +1,132 @@
+<!-- reservations/templates/reservations/restaurant_calendar.html -->
+
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Restaurant Reservations</title>
+    <link rel="stylesheet" href="{% static 'reservations/styles.css' %}">
+</head>
+<body>
+<div class="container">
+    <h1 class="text-3xl font-light mb-6 text-center">Restaurant Reservations</h1>
+
+    <!-- Date Picker Form -->
+    <form method="get" action="{% url 'restaurant_calendar' %}" class="mb-4 text-center">
+        <label for="date">Select Date:</label>
+        <input type="date" id="date" name="date" value="{{ selected_date }}">
+        <button type="submit">Go</button>
+    </form>
+
+    <div class="grid" id="calendarGrid">
+        <!-- The grid will be populated by JavaScript -->
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="reservationModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2 class="text-xl font-medium mb-2">Reservation Details</h2>
+        <p><strong>Name:</strong> <span id="resName"></span></p>
+        <p><strong>Table(s):</strong> <span id="resTables"></span></p>
+        <p><strong>Time:</strong> <span id="resTime"></span></p>
+    </div>
+</div>
+
+<!-- Include JSON data using json_script -->
+{{ tables|json_script:"tables-data" }}
+{{ time_slots|json_script:"time-slots-data" }}
+{{ reservations_json|json_script:"reservations-data" }}
+
+<script>
+    // Data from the view
+    const tables = JSON.parse(document.getElementById('tables-data').textContent);
+    const timeSlots = JSON.parse(document.getElementById('time-slots-data').textContent);
+    const reservations = JSON.parse(document.getElementById('reservations-data').textContent);
+
+    // JavaScript code to build the calendar grid
+    const calendarGrid = document.getElementById('calendarGrid');
+
+    // Build grid-template-columns dynamically
+    calendarGrid.style.gridTemplateColumns = `auto repeat(${tables.length}, 1fr)`;
+
+    // Table Headers
+    const emptyHeader = document.createElement('div');
+    emptyHeader.classList.add('sticky', 'left-0', 'bg-gray-100');
+    calendarGrid.appendChild(emptyHeader);
+
+    tables.forEach(table => {
+        const tableHeader = document.createElement('div');
+        tableHeader.classList.add('text-center', 'font-medium', 'py-2');
+        tableHeader.textContent = table.number;
+        calendarGrid.appendChild(tableHeader);
+    });
+
+    // Time Slots and Cells
+    timeSlots.forEach(timeStr => {
+        const time = new Date(timeStr);
+        const timeCell = document.createElement('div');
+        timeCell.classList.add('sticky', 'left-0', 'bg-gray-100', 'pr-2', 'text-right', 'text-sm', 'py-2');
+        timeCell.textContent = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        calendarGrid.appendChild(timeCell);
+
+        tables.forEach(table => {
+            const cell = document.createElement('div');
+            cell.classList.add('border', 'border-gray-200', 'bg-white');
+            const reservation = getReservationForSlot(table.number, time);
+
+            if (reservation) {
+                cell.classList.add('bg-blue-100');
+                if (isSameMinute(new Date(reservation.start_datetime), time)) {
+                    cell.classList.add('rounded-t-md');
+                    const resName = document.createElement('div');
+                    resName.classList.add('text-xs', 'p-1', 'truncate');
+                    resName.textContent = reservation.guest_name;
+                    cell.appendChild(resName);
+                }
+                cell.addEventListener('click', () => showReservationDetails(reservation.id));
+            }
+
+            calendarGrid.appendChild(cell);
+        });
+    });
+
+    function getReservationForSlot(tableNumber, time) {
+        return reservations.find(res =>
+            res.tables.includes(tableNumber) &&
+            time >= new Date(res.start_datetime) &&
+            time < new Date(res.end_datetime)
+        );
+    }
+
+    function isSameMinute(date1, date2) {
+        return date1.getTime() === date2.getTime();
+    }
+
+    function showReservationDetails(resId) {
+        const reservation = reservations.find(res => res.id === resId);
+        if (reservation) {
+            document.getElementById('resName').textContent = reservation.guest_name;
+            document.getElementById('resTables').textContent = reservation.tables.join(', ');
+            const startTime = new Date(reservation.start_datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const endTime = new Date(reservation.end_datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('resTime').textContent = `${startTime} - ${endTime}`;
+            document.getElementById('reservationModal').style.display = 'block';
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('reservationModal').style.display = 'none';
+    }
+
+    // Close the modal when clicking outside of it
+    window.onclick = function(event) {
+        const modal = document.getElementById('reservationModal');
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+</script>
+</body>
+</html>
