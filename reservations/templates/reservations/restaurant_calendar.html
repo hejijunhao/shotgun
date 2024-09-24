@@ -34,11 +34,6 @@
     </div>
 </div>
 
-<!-- Include JSON data using json_script -->
-{{ tables|json_script:"tables-data" }}
-{{ time_slots|json_script:"time-slots-data" }}
-{{ reservations_json|json_script:"reservations-data" }}
-
 <script>
     // Data from the view
     const tables = JSON.parse(document.getElementById('tables-data').textContent);
