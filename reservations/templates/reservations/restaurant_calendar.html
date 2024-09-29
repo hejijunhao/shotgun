@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shotgun</title>
     <!-- Main styles for the calendar -->
@@ -19,15 +20,20 @@
         <img src="{% static 'reservations/AppIcon.png' %}" alt="Logo" class="header-logo">
     </div>
 
-    <!-- Title and Subtext -->
-    <div class="header-content">
-        <h1 class="header-title">Shotgun Calendar</h1>
-        <p class="header-subtext">Manage your restaurant reservations efficiently</p>
+    <!-- Date Navigation Section -->
+    <div class="date-navigation-container">
+        <!-- Left Arrow -->
+        <button id="prevDay" class="date-nav-arrow">&#9664;</button>
+        
+        <!-- Selected Date -->
+        <span class="selected-date">{{ selected_date }}</span>
+        
+        <!-- Right Arrow -->
+        <button id="nextDay" class="date-nav-arrow">&#9654;</button>
     </div>
 
-    <!-- Action Buttons (Optional) -->
+    <!-- Action Buttons -->
     <div class="header-actions">
-        <button class="calendar-action">Calendar</button>
         <button class="primary-action">Add Reservation</button>
         <button class="secondary-action">Settings</button>
     </div>
@@ -35,22 +41,6 @@
 
 <!-- Main Content Section (Calendar) -->
 <div class="container">
-    <div class="text-center mb-6">
-        <!-- Left Arrow -->
-        <button id="prevDay" class="arrow" style="cursor: pointer;">&#9664;</button>
-        <!-- Sub-heading with clickable date -->
-        <span id="subheading-date" class="text-2xl font-medium cursor-pointer">{{ selected_date }}</span>
-        <!-- Right Arrow -->
-        <button id="nextDay" class="arrow" style="cursor: pointer;">&#9654;</button>
-    </div>
-
-    <!-- Date Picker Form (hidden initially, opened when date is clicked) -->
-    <form id="datePickerForm" method="get" action="{% url 'restaurant_calendar' %}" class="text-center mb-4" style="display:none;">
-        <label for="date">Select Date:</label>
-        <input type="date" id="date" name="date" value="{{ selected_date }}">
-        <button type="submit">Go</button>
-    </form>
-
     <div class="grid" id="calendarGrid">
         <!-- The grid will be populated by JavaScript -->
     </div>
@@ -93,23 +83,21 @@
     const calendarGrid = document.getElementById('calendarGrid');
     const prevDayButton = document.getElementById('prevDay');
     const nextDayButton = document.getElementById('nextDay');
-    const dateSpan = document.getElementById('subheading-date');
-    const datePickerForm = document.getElementById('datePickerForm');
+    const dateSpan = document.querySelector('.selected-date'); // Corrected ID selector
+
+    console.log("Tables:", tables);
+    console.log("Time Slots:", timeSlots);
+    console.log("Reservations:", reservations);
 
     // Centralize the date and arrows horizontally
-    document.querySelector('.text-center').style.display = 'flex';
-    document.querySelector('.text-center').style.justifyContent = 'center';
-    document.querySelector('.text-center').style.alignItems = 'center';
-    document.querySelector('.text-center').style.gap = '20px';
+    document.querySelector('.date-navigation-container').style.display = 'flex';
+    document.querySelector('.date-navigation-container').style.justifyContent = 'center';
+    document.querySelector('.date-navigation-container').style.alignItems = 'center';
+    document.querySelector('.date-navigation-container').style.gap = '10px';
 
     // Event listeners to change the date
     prevDayButton.addEventListener('click', () => changeDate(-1));
     nextDayButton.addEventListener('click', () => changeDate(1));
-
-    // Make the date clickable to open the calendar date picker
-    dateSpan.addEventListener('click', () => {
-        datePickerForm.style.display = 'block';
-    });
 
     // Function to change the date
     function changeDate(days) {
@@ -120,7 +108,7 @@
     }
 
     // Populating the calendar grid
-    calendarGrid.style.gridTemplateColumns = `auto repeat(${tables.length}, 1fr)`;
+    calendarGrid.style.gridTemplateColumns = `auto repeat(${tables.length}, minmax(100px, 1fr))`; // Updated grid
 
     // Table Headers
     const emptyHeader = document.createElement('div');
@@ -199,91 +187,90 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-    // Open the modal when the Calendar button is clicked
-    const calendarButton = document.querySelector('.calendar-action');
-    const calendarModal = document.getElementById('calendarModal');
-    const closeModalButton = document.querySelector('.close');
+        // Open the modal when the Calendar button is clicked
+        const calendarButton = document.querySelector('.calendar-action');
+        const calendarModal = document.getElementById('calendarModal');
+        const closeModalButton = document.querySelector('.close');
 
-    calendarButton.addEventListener('click', function () {
-        calendarModal.style.display = 'block'; // Show the modal
-    });
+        calendarButton.addEventListener('click', function () {
+            calendarModal.style.display = 'block'; // Show the modal
+        });
 
-    // Close the modal when the "x" button is clicked
-    closeModalButton.addEventListener('click', function () {
-        calendarModal.style.display = 'none'; // Hide the modal
-    });
+        // Close the modal when the "x" button is clicked
+        closeModalButton.addEventListener('click', function () {
+            calendarModal.style.display = 'none'; // Hide the modal
+        });
 
-    // Close the modal when clicking outside the modal content
-    window.addEventListener('click', function (event) {
-        if (event.target == calendarModal) {
-            calendarModal.style.display = 'none';
-        }
-    });
+        // Close the modal when clicking outside the modal content
+        window.addEventListener('click', function (event) {
+            if (event.target == calendarModal) {
+                calendarModal.style.display = 'none';
+            }
+        });
 
-    // Handle navigation between months
-    const prevMonthButton = document.getElementById('prevMonth');
-    const nextMonthButton = document.getElementById('nextMonth');
-    let currentDate = new Date();
+        // Handle navigation between months
+        const prevMonthButton = document.getElementById('prevMonth');
+        const nextMonthButton = document.getElementById('nextMonth');
+        let currentDate = new Date();
 
-    function renderCalendar() {
-        const monthYearDisplay = document.getElementById('calendarMonthYear');
-        const calendarDays = document.getElementById('calendarTable');
-        
-        // Clear previous calendar days
-        calendarDays.innerHTML = '';
+        function renderCalendar() {
+            const monthYearDisplay = document.getElementById('calendarMonthYear');
+            const calendarDays = document.getElementById('calendarTable');
+            
+            // Clear previous calendar days
+            calendarDays.innerHTML = '';
 
-        const currentMonth = currentDate.getMonth();
-        const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth();
+            const currentYear = currentDate.getFullYear();
 
-        // Display the current month and year
-        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        monthYearDisplay.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+            // Display the current month and year
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            monthYearDisplay.textContent = `${monthNames[currentMonth]} ${currentYear}`;
 
-        // Get the first day of the month
-        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            // Get the first day of the month
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
 
-        // Get the number of days in the current month
-        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            // Get the number of days in the current month
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-        // Add blank cells for days before the first of the month
-        for (let i = 0; i < firstDay; i++) {
-            const blankCell = document.createElement('td');
-            calendarDays.appendChild(blankCell);
-        }
+            // Add blank cells for days before the first of the month
+            for (let i = 0; i < firstDay; i++) {
+                const blankCell = document.createElement('td');
+                calendarDays.appendChild(blankCell);
+            }
 
-        // Add the days of the month
-        for (let day = 1; day <= daysInMonth; day++) {
-            const dayCell = document.createElement('td');
-            dayCell.textContent = day;
-            dayCell.addEventListener('click', function () {
-                alert(`You selected ${day} ${monthNames[currentMonth]} ${currentYear}`);
-            });
-            calendarDays.appendChild(dayCell);
+            // Add the days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayCell = document.createElement('td');
+                dayCell.textContent = day;
+                dayCell.addEventListener('click', function () {
+                    alert(`You selected ${day} ${monthNames[currentMonth]} ${currentYear}`);
+                });
+                calendarDays.appendChild(dayCell);
 
-            // Start a new row after every 7th day (i.e., end of the week)
-            if ((day + firstDay) % 7 === 0) {
-                const row = document.createElement('tr');
-                calendarDays.appendChild(row);
+                // Start a new row after every 7th day (i.e., end of the week)
+                if ((day + firstDay) % 7 === 0) {
+                    const row = document.createElement('tr');
+                    calendarDays.appendChild(row);
+                }
             }
         }
-    }
 
-    // Navigate to the previous month
-    prevMonthButton.addEventListener('click', function () {
-        currentDate.setMonth(currentDate.getMonth() - 1);
+        // Navigate to the previous month
+        prevMonthButton.addEventListener('click', function () {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        // Navigate to the next month
+        nextMonthButton.addEventListener('click', function () {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        // Initial render of the calendar
         renderCalendar();
     });
-
-    // Navigate to the next month
-    nextMonthButton.addEventListener('click', function () {
-        currentDate.setMonth(currentDate.getMonth() + 1);
-        renderCalendar();
-    });
-
-    // Initial render of the calendar
-    renderCalendar();
-});
-
 </script>
 
 </body>
