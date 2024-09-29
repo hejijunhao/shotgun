@@ -76,8 +76,173 @@
     border-radius: 5px;
     cursor: pointer;
     margin-left: 10px;
+    margin-right: 10px;
 }
 
 .calendar-action:hover {
     background-color: #e2e2e2;
+}
+
+/* Calendar Modal Styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+}
+
+.modal-content {
+    background-color: #2b2b2b;
+    margin: 15% auto;
+    padding: 20px;
+    width: 300px;
+    max-width: 90%;
+    border-radius: 10px;
+    color: #fff;
+}
+
+/* Calendar header */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.calendar-month-year {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* Calendar table */
+.calendar-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    color: #fff;
+}
+
+.calendar-table th,
+.calendar-table td {
+    padding: 10px;
+    font-size: 1rem;
+}
+
+.calendar-table th {
+    background-color: #444;
+}
+
+.calendar-table td {
+    background-color: #333;
+    cursor: pointer;
+}
+
+.calendar-table td:hover {
+    background-color: #555;
+}
+
+.arrow {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #fff;
+    cursor: pointer;
+}
+
+.close {
+    color: #fff;
+    float: right;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #ccc;
+}
+
+/* Calendar Modal Styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+}
+
+.modal-content {
+    background-color: #2b2b2b;
+    margin: 15% auto;
+    padding: 20px;
+    width: 300px;
+    max-width: 90%;
+    border-radius: 10px;
+    color: #fff;
+}
+
+/* Calendar header */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.calendar-month-year {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* Calendar pop-up table */
+.calendar-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    color: #fff;
+}
+
+.calendar-table th,
+.calendar-table td {
+    padding: 10px;
+    font-size: 1rem;
+}
+
+.calendar-table th {
+    background-color: #444;
+}
+
+.calendar-table td {
+    background-color: #333;
+    cursor: pointer;
+}
+
+.calendar-table td:hover {
+    background-color: #555;
+}
+
+.arrow {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #fff;
+    cursor: pointer;
+}
+
+.close {
+    color: #fff;
+    float: right;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #ccc;
 }
