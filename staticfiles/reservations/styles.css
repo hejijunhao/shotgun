@@ -68,7 +68,7 @@
 }
 
 .modal {
-    display: none; /* Hidden by default */
+    display: block; /* Hidden by default */
     position: fixed;
     z-index: 100;
     left: 0;
@@ -113,4 +113,37 @@
 
 .empty-time-cell {
     visibility: hidden; /* Ensures empty cells take up space but are invisible */
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+.header-title, .header-subtext, .primary-action, .secondary-action {
+    font-family: 'Inter', sans-serif;
+}
+
+.date-navigation-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* Space between arrows and date */
+}
+
+.selected-date {
+    background-color: #f5f5f5; /* Same as the 'Settings' button */
+    color: #333;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: 1px solid #e2e2e2; /* Matches the 'Settings' button border */
+    font-size: 1.5rem; /* Slightly larger font for emphasis */
+    font-weight: bold;
+}
+
+.date-nav-arrow {
+    background-color: #f5f5f5; /* Same as the box */
+    color: #333;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #e2e2e2; /* Matches border style */
 }

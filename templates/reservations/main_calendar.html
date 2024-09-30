@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Calendar</title>
+    
+    {% load static %}
+    
+    <!-- Tailwind CSS -->
+    <link href="{% static 'css/tailwind_output.css' %}" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+    <div class="container mx-auto px-4 py-8">
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div class="px-4 py-5 border-b border-gray-200 bg-gray-50">
+                <h2 class="text-lg leading-6 font-medium text-gray-900">
+                    Calendar for {{ current_month }}
+                </h2>
+            </div>
+            <div class="grid grid-cols-7 gap-1 p-4">
+                <!-- Weekday Headers -->
+                <div class="font-semibold text-center">Sun</div>
+                <div class="font-semibold text-center">Mon</div>
+                <div class="font-semibold text-center">Tue</div>
+                <div class="font-semibold text-center">Wed</div>
+                <div class="font-semibold text-center">Thu</div>
+                <div class="font-semibold text-center">Fri</div>
+                <div class="font-semibold text-center">Sat</div>
+
+                <!-- Calendar Days -->
+                {% for day in days_in_month %}
+                    <div class="text-center py-2 bg-gray-100 hover:bg-gray-200 rounded">
+                        {{ day }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Flowbite JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js"></script>
+</body>
+</html>

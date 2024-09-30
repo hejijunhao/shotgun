@@ -60,7 +60,7 @@ ROOT_URLCONF = 'shotgun.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],  # Tell Django to look in the root-level 'templates' directory
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -127,7 +127,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / 'reservations/static',
+    BASE_DIR / 'frontend/static',
 ]
 
 # This is where all static files will be collected when you run `collectstatic`
