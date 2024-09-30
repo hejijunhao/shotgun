@@ -1,1 +1,33 @@
-<h1>Welcome to the Home Page!</h1>
+{% load compress %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Django + Tailwind CSS + Flowbite</title>
+
+    <link rel="stylesheet" href="{% static 'css/tailwind_output.css' %}">
+
+    <span class="text-red-500">Test Tailwind CSS</span>
+
+</head>
+
+<body class="bg-green-50">
+
+    <!-- Include the main header component here -->
+    {% include 'reservations/components/main_header.html' %}
+
+    <div class="container mx-auto mt-4">
+        {% block content %}
+        {% endblock content %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+    
+</body>
+
+</html>

@@ -37,9 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
     'corsheaders',  # For handling CORS
     'reservations',
+    'compressor',
+    'tailwind',
+    'theme',
 ]
 
 MIDDLEWARE = [
@@ -130,6 +132,14 @@ STATICFILES_DIRS = [
     BASE_DIR / 'frontend/static',
 ]
 
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+]
+
+COMPRESS_ENABLED = True
+
 # This is where all static files will be collected when you run `collectstatic`
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
@@ -137,3 +147,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Tailwind integation
+
+TAILWIND_APP_NAME = 'theme'
+TAILWIND_CSS_PATH = 'css/tailwind_input.css'
+TAILWIND_CONFIG_FILE = BASE_DIR / 'config' / 'tailwind.config.js'
+TAILWIND_POSTCSS_CONFIG = BASE_DIR / 'config' / 'postcss.config.js'
