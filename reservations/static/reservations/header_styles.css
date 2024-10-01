@@ -1,5 +1,7 @@
 /* reservations/static/reservations/header_styles.css */
 
+@import "flowbite/dist/flowbite.css";
+
 /* Header Styles */
 .header-container {
     display: flex;

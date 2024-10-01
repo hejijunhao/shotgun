@@ -1,5 +1,7 @@
 /* reservations/static/reservations/styles.css */
 
+@import "flowbite/dist/flowbite.css";
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
