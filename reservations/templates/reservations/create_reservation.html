@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Reservation{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'reservations/create_reservation.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="overlay" id="reservationOverlay">
+    <div class="popup">
+        <h2>Create New Reservation</h2>
+        <form id="reservationForm">
+            <div class="form-group">
+                <label for="customerName">Customer Name:</label>
+                <input type="text" id="customerName" name="customerName" required>
+            </div>
+            <div class="form-group">
+                <label for="phoneNumber">Phone Number:</label>
+                <input type="tel" id="phoneNumber" name="phoneNumber" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label>Assigned Table Number:</label>
+                <div class="table-list" id="tableList">
+                    <!-- Table checkboxes will be dynamically populated here -->
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="assignedDate">Assigned Date:</label>
+                <select id="assignedDate" name="assignedDate" required>
+                    <!-- Date options will be dynamically populated here -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="startingTime">Assigned Starting Time:</label>
+                <select id="startingTime" name="startingTime" required>
+                    <!-- Time options will be dynamically populated here -->
+                </select>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Create Reservation</button>
+                <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Populate table list
+    const tableList = document.getElementById('tableList');
+    const tables = {{ tables|safe }};  // Assume tables data is passed from the backend
+    tables.forEach(table => {
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `table-${table.number}`;
+        checkbox.name = 'tables';
+        checkbox.value = table.id;
+
+        const label = document.createElement('label');
+        label.htmlFor = `table-${table.number}`;
+        label.textContent = `Table ${table.number}`;
+
+        const div = document.createElement('div');
+        div.classList.add('table-item');
+        div.appendChild(checkbox);
+        div.appendChild(label);
+
+        tableList.appendChild(div);
+    });
+
+    // Populate date dropdown
+    const dateSelect = document.getElementById('assignedDate');
+    const today = new Date();
+    for (let i = 0; i < 14; i++) {  // Show dates for the next 14 days
+        const date = new Date(today);
+        date.setDate(today.getDate() + i);
+        const option = document.createElement('option');
+        option.value = date.toISOString().split('T')[0];
+        option.textContent = date.toLocaleDateString();
+        dateSelect.appendChild(option);
+    }
+
+    // Populate time dropdown
+    const timeSelect = document.getElementById('startingTime');
+    for (let hour = 11; hour < 22; hour++) {  // Assume restaurant opens from 11 AM to 10 PM
+        for (let minute = 0; minute < 60; minute += 30) {
+            const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+            const option = document.createElement('option');
+            option.value = time;
+            option.textContent = time;
+            timeSelect.appendChild(option);
+        }
+    }
+
+    // Handle form submission
+    document.getElementById('reservationForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        // Here you would typically send the form data to your backend
+        console.log('Form submitted');
+        // Close the popup after submission
+        document.getElementById('reservationOverlay').style.display = 'none';
+    });
+
+    // Handle cancel button
+    document.getElementById('cancelBtn').addEventListener('click', function() {
+        document.getElementById('reservationOverlay').style.display = 'none';
+    });
+</script>
+{% endblock %}
