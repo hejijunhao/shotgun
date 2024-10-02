@@ -1,60 +1,44 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Restaurant Calendar{% endblock %}
 
 {% block extra_css %}
-<style>
-    .time-cell, .empty-time-cell {
-        height: 30px;
-    }
-</style>
+<link rel="stylesheet" href="{% static 'reservations/styles.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="container mx-auto p-4">
     <!-- Header Section -->
-    <div class="flex justify-between items-center mb-4">
+    <div class="header-container">
         <div class="flex items-center space-x-4">
             <img src="{% static 'reservations/AppIcon.png' %}" alt="Logo" class="h-10 w-10">
             <h1 class="text-2xl font-bold">Shotgun</h1>
         </div>
-        <div class="flex items-center space-x-2">
-            <button id="prevDay" class="px-2 py-1 bg-gray-200 rounded">&lt;</button>
-            <span class="selected-date text-lg font-medium">{{ selected_date }}</span>
-            <button id="nextDay" class="px-2 py-1 bg-gray-200 rounded">&gt;</button>
+        <div class="date-navigation">
+            <button id="prevDay" class="date-nav-arrow">&lt;</button>
+            <span id="selectedDate" class="selected-date">{{ selected_date }}</span>
+            <button id="nextDay" class="date-nav-arrow">&gt;</button>
         </div>
-        <div class="space-x-2">
-            <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Add Reservation</button>
-            <button class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Settings</button>
-        </div>
+        <button class="btn btn-primary">Add Reservation</button>
     </div>
 
     <!-- Calendar Grid -->
-    <div class="overflow-x-auto">
-        <div class="grid" id="calendarGrid" style="min-width: max-content;">
+    <div class="calendar-container">
+        <div id="calendarGrid" class="calendar-grid">
             <!-- The grid will be populated by JavaScript -->
         </div>
     </div>
 </div>
 
 <!-- Reservation Modal -->
-<div id="reservationModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <div class="mt-3 text-center">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Reservation Details</h3>
-            <div class="mt-2 px-7 py-3">
-                <p class="text-sm text-gray-500">
-                    <strong>Name:</strong> <span id="resName"></span><br>
-                    <strong>Table(s):</strong> <span id="resTables"></span><br>
-                    <strong>Time:</strong> <span id="resTime"></span>
-                </p>
-            </div>
-            <div class="items-center px-4 py-3">
-                <button id="closeModal" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
-                    Close
-                </button>
-            </div>
-        </div>
+<div id="reservationModal" class="modal hidden">
+    <div class="modal-content">
+        <h3 class="modal-title">Reservation Details</h3>
+        <p><strong>Name:</strong> <span id="resName"></span></p>
+        <p><strong>Table(s):</strong> <span id="resTables"></span></p>
+        <p><strong>Time:</strong> <span id="resTime"></span></p>
+        <button id="closeModal" class="btn btn-secondary">Close</button>
     </div>
 </div>
 {% endblock %}
@@ -64,60 +48,65 @@
     const tables = {{ tables|safe }};
     const timeSlots = {{ time_slots|safe }};
     const reservations = {{ reservations|safe }};
-    const selectedDate = new Date("{{ selected_date }}");
+    let selectedDate = new Date("{{ selected_date }}");
 
     const calendarGrid = document.getElementById('calendarGrid');
     const prevDayButton = document.getElementById('prevDay');
     const nextDayButton = document.getElementById('nextDay');
+    const selectedDateSpan = document.getElementById('selectedDate');
 
-    // Populating the calendar grid
-    calendarGrid.style.gridTemplateColumns = `auto repeat(${tables.length}, minmax(100px, 1fr))`;
+    function initializeCalendar() {
+        calendarGrid.innerHTML = '';
+        calendarGrid.style.gridTemplateColumns = `auto repeat(${tables.length}, 1fr)`;
 
-    // Table Headers
-    const emptyHeader = document.createElement('div');
-    emptyHeader.classList.add('sticky', 'left-0', 'bg-gray-100');
-    calendarGrid.appendChild(emptyHeader);
-
-    tables.forEach(table => {
-        const tableHeader = document.createElement('div');
-        tableHeader.classList.add('text-center', 'font-medium', 'py-2');
-        tableHeader.textContent = `Table ${table.number}`;
-        calendarGrid.appendChild(tableHeader);
-    });
-
-    // Time Slots and Cells
-    timeSlots.forEach(timeStr => {
-        const time = new Date(`1970-01-01T${timeStr}:00`);
-
-        const timeCell = document.createElement('div');
-        if (time.getMinutes() === 0) {
-            timeCell.classList.add('sticky', 'left-0', 'bg-gray-100', 'pr-2', 'text-right', 'text-sm', 'py-2', 'time-cell');
-            timeCell.textContent = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        } else {
-            timeCell.classList.add('sticky', 'left-0', 'bg-gray-100', 'pr-2', 'text-sm', 'py-2', 'empty-time-cell');
-        }
-        calendarGrid.appendChild(timeCell);
-
+        // Table Headers
+        const headerRow = document.createElement('div');
+        headerRow.classList.add('grid-row', 'header-row');
+        headerRow.appendChild(createCell('', ['calendar-cell', 'sticky', 'table-header']));
         tables.forEach(table => {
-            const cell = document.createElement('div');
-            cell.classList.add('border', 'border-gray-200', 'bg-white');
-            const reservation = getReservationForSlot(table.number, timeStr);
-
-            if (reservation) {
-                cell.classList.add('bg-blue-100');
-                if (isSameMinute(new Date(reservation.start_datetime), timeStr)) {
-                    cell.classList.add('rounded-t-md');
-                    const resName = document.createElement('div');
-                    resName.classList.add('text-xs', 'p-1', 'truncate');
-                    resName.textContent = reservation.guest__name;
-                    cell.appendChild(resName);
-                }
-                cell.addEventListener('click', () => showReservationDetails(reservation.id));
-            }
-
-            calendarGrid.appendChild(cell);
+            headerRow.appendChild(createCell(`Table ${table.number}`, ['calendar-cell', 'text-center', 'table-header']));
         });
-    });
+        calendarGrid.appendChild(headerRow);
+
+        // Time Slots and Cells
+        timeSlots.forEach((timeStr, index) => {
+            const rowElement = document.createElement('div');
+            rowElement.classList.add('grid-row');
+            
+            const time = new Date(`1970-01-01T${timeStr}:00`);
+            const timeCell = createCell(
+                time.getMinutes() === 0 ? time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+                ['calendar-cell', 'sticky', 'left-0', 'time-cell']
+            );
+            rowElement.appendChild(timeCell);
+
+            tables.forEach(table => {
+                const reservation = getReservationForSlot(table.number, timeStr);
+                const cell = createCell('', ['calendar-cell']);
+                if (reservation) {
+                    cell.classList.add('bg-blue-100');
+                    if (isSameMinute(new Date(reservation.start_datetime), timeStr)) {
+                        cell.classList.add('rounded-t-md');
+                        const resName = document.createElement('div');
+                        resName.classList.add('text-xs', 'p-1', 'truncate');
+                        resName.textContent = reservation.guest__name;
+                        cell.appendChild(resName);
+                    }
+                    cell.addEventListener('click', () => showReservationDetails(reservation));
+                }
+                rowElement.appendChild(cell);
+            });
+
+            calendarGrid.appendChild(rowElement);
+        });
+    }
+
+    function createCell(content, classes) {
+        const cell = document.createElement('div');
+        cell.classList.add(...classes);
+        cell.textContent = content;
+        return cell;
+    }
 
     function getReservationForSlot(tableNumber, time) {
         return reservations.find(res =>
@@ -130,30 +119,37 @@
         return date1.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) === timeStr;
     }
 
-    function showReservationDetails(resId) {
-        const reservation = reservations.find(res => res.id === resId);
-        if (reservation) {
-            document.getElementById('resName').textContent = reservation.guest__name;
-            document.getElementById('resTables').textContent = reservation.tables__number;
-            const startTime = new Date(reservation.start_datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const endTime = new Date(reservation.end_datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            document.getElementById('resTime').textContent = `${startTime} - ${endTime}`;
-            document.getElementById('reservationModal').classList.remove('hidden');
-        }
+    function showReservationDetails(reservation) {
+        document.getElementById('resName').textContent = reservation.guest__name;
+        document.getElementById('resTables').textContent = reservation.tables__number;
+        const startTime = new Date(reservation.start_datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const endTime = new Date(reservation.end_datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('resTime').textContent = `${startTime} - ${endTime}`;
+        document.getElementById('reservationModal').classList.remove('hidden');
     }
 
     document.getElementById('closeModal').addEventListener('click', () => {
         document.getElementById('reservationModal').classList.add('hidden');
     });
 
+    function changeDate(days) {
+        selectedDate.setDate(selectedDate.getDate() + days);
+        updateCalendar();
+    }
+
+    function updateCalendar() {
+        const formattedDate = selectedDate.toISOString().split('T')[0];
+        selectedDateSpan.textContent = formattedDate;
+        
+        // Here you would typically fetch new data for the selected date
+        // For now, we'll just reinitialize the calendar with the same data
+        initializeCalendar();
+    }
+
     prevDayButton.addEventListener('click', () => changeDate(-1));
     nextDayButton.addEventListener('click', () => changeDate(1));
 
-    function changeDate(days) {
-        const newDate = new Date(selectedDate);
-        newDate.setDate(newDate.getDate() + days);
-        const formattedDate = newDate.toISOString().split('T')[0];
-        window.location.href = `?date=${formattedDate}`;
-    }
+    // Initialize the calendar when the page loads
+    initializeCalendar();
 </script>
 {% endblock %}
