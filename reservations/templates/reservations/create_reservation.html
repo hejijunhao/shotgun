@@ -3,50 +3,52 @@
 
 {% block title %}Create Reservation{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'reservations/create_reservation.css' %}">
-{% endblock %}
-
 {% block content %}
-<div class="overlay" id="reservationOverlay">
-    <div class="popup">
-        <h2>Create New Reservation</h2>
-        <form id="reservationForm">
-            <div class="form-group">
-                <label for="customerName">Customer Name:</label>
-                <input type="text" id="customerName" name="customerName" required>
-            </div>
-            <div class="form-group">
-                <label for="phoneNumber">Phone Number:</label>
-                <input type="tel" id="phoneNumber" name="phoneNumber" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <div class="form-group">
-                <label>Assigned Table Number:</label>
-                <div class="table-list" id="tableList">
-                    <!-- Table checkboxes will be dynamically populated here -->
+<div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" id="reservationOverlay">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3 text-center">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Create New Reservation</h3>
+            <form id="reservationForm" class="mt-2 text-left">
+                <div class="mb-4">
+                    <label for="customerName" class="block text-sm font-medium text-gray-700">Customer Name:</label>
+                    <input type="text" id="customerName" name="customerName" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                 </div>
-            </div>
-            <div class="form-group">
-                <label for="assignedDate">Assigned Date:</label>
-                <select id="assignedDate" name="assignedDate" required>
-                    <!-- Date options will be dynamically populated here -->
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="startingTime">Assigned Starting Time:</label>
-                <select id="startingTime" name="startingTime" required>
-                    <!-- Time options will be dynamically populated here -->
-                </select>
-            </div>
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Create Reservation</button>
-                <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
-            </div>
-        </form>
+                <div class="mb-4">
+                    <label for="phoneNumber" class="block text-sm font-medium text-gray-700">Phone Number:</label>
+                    <input type="tel" id="phoneNumber" name="phoneNumber" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email:</label>
+                    <input type="email" id="email" name="email" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Assigned Table Number:</label>
+                    <div id="tableList" class="mt-1 max-h-40 overflow-y-auto border border-gray-300 rounded-md p-2">
+                        <!-- Table checkboxes will be dynamically populated here -->
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="assignedDate" class="block text-sm font-medium text-gray-700">Assigned Date:</label>
+                    <select id="assignedDate" name="assignedDate" required class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <!-- Date options will be dynamically populated here -->
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="startingTime" class="block text-sm font-medium text-gray-700">Assigned Starting Time:</label>
+                    <select id="startingTime" name="startingTime" required class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <!-- Time options will be dynamically populated here -->
+                    </select>
+                </div>
+                <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                    <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm">
+                        Create Reservation
+                    </button>
+                    <button type="button" id="cancelBtn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -57,21 +59,23 @@
     const tableList = document.getElementById('tableList');
     const tables = {{ tables|safe }};  // Assume tables data is passed from the backend
     tables.forEach(table => {
+        const div = document.createElement('div');
+        div.classList.add('flex', 'items-center', 'mb-2');
+        
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.id = `table-${table.number}`;
         checkbox.name = 'tables';
         checkbox.value = table.id;
+        checkbox.classList.add('form-checkbox', 'h-4', 'w-4', 'text-indigo-600', 'transition', 'duration-150', 'ease-in-out');
 
         const label = document.createElement('label');
         label.htmlFor = `table-${table.number}`;
         label.textContent = `Table ${table.number}`;
+        label.classList.add('ml-2', 'block', 'text-sm', 'text-gray-900');
 
-        const div = document.createElement('div');
-        div.classList.add('table-item');
         div.appendChild(checkbox);
         div.appendChild(label);
-
         tableList.appendChild(div);
     });
 

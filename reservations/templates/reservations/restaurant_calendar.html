@@ -20,7 +20,7 @@
             <span id="selectedDate" class="selected-date">{{ selected_date }}</span>
             <button id="nextDay" class="date-nav-arrow">&gt;</button>
         </div>
-        <button class="btn btn-primary">Add Reservation</button>
+        <button id="addReservationBtn" class="btn btn-primary">Add Reservation</button>
     </div>
 
     <!-- Calendar Grid -->
@@ -31,7 +31,7 @@
     </div>
 </div>
 
-<!-- Reservation Modal -->
+<!-- Reservation Details Modal -->
 <div id="reservationModal" class="modal hidden">
     <div class="modal-content">
         <h3 class="modal-title">Reservation Details</h3>
@@ -39,6 +39,55 @@
         <p><strong>Table(s):</strong> <span id="resTables"></span></p>
         <p><strong>Time:</strong> <span id="resTime"></span></p>
         <button id="closeModal" class="btn btn-secondary">Close</button>
+    </div>
+</div>
+
+<!-- Add Reservation Modal -->
+<div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden" id="addReservationModal">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3 text-center">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Create New Reservation</h3>
+            <form id="reservationForm" class="mt-2 text-left">
+                <div class="mb-4">
+                    <label for="customerName" class="block text-sm font-medium text-gray-700">Customer Name:</label>
+                    <input type="text" id="customerName" name="customerName" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <div class="mb-4">
+                    <label for="phoneNumber" class="block text-sm font-medium text-gray-700">Phone Number:</label>
+                    <input type="tel" id="phoneNumber" name="phoneNumber" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email:</label>
+                    <input type="email" id="email" name="email" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Assigned Table Number:</label>
+                    <div id="tableList" class="mt-1 max-h-40 overflow-y-auto border border-gray-300 rounded-md p-2">
+                        <!-- Table checkboxes will be dynamically populated here -->
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="assignedDate" class="block text-sm font-medium text-gray-700">Assigned Date:</label>
+                    <select id="assignedDate" name="assignedDate" required class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <!-- Date options will be dynamically populated here -->
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="startingTime" class="block text-sm font-medium text-gray-700">Assigned Starting Time:</label>
+                    <select id="startingTime" name="startingTime" required class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <!-- Time options will be dynamically populated here -->
+                    </select>
+                </div>
+                <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                    <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm">
+                        Create Reservation
+                    </button>
+                    <button type="button" id="cancelAddReservationBtn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -54,6 +103,9 @@
     const prevDayButton = document.getElementById('prevDay');
     const nextDayButton = document.getElementById('nextDay');
     const selectedDateSpan = document.getElementById('selectedDate');
+    const addReservationBtn = document.getElementById('addReservationBtn');
+    const addReservationModal = document.getElementById('addReservationModal');
+    const cancelAddReservationBtn = document.getElementById('cancelAddReservationBtn');
 
     function initializeCalendar() {
         calendarGrid.innerHTML = '';
@@ -146,8 +198,80 @@
         initializeCalendar();
     }
 
+    function populateAddReservationForm() {
+        const tableList = document.getElementById('tableList');
+        tableList.innerHTML = '';
+        tables.forEach(table => {
+            const div = document.createElement('div');
+            div.classList.add('flex', 'items-center', 'mb-2');
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `table-${table.number}`;
+            checkbox.name = 'tables';
+            checkbox.value = table.id;
+            checkbox.classList.add('form-checkbox', 'h-4', 'w-4', 'text-indigo-600', 'transition', 'duration-150', 'ease-in-out');
+
+            const label = document.createElement('label');
+            label.htmlFor = `table-${table.number}`;
+            label.textContent = `Table ${table.number}`;
+            label.classList.add('ml-2', 'block', 'text-sm', 'text-gray-900');
+
+            div.appendChild(checkbox);
+            div.appendChild(label);
+            tableList.appendChild(div);
+        });
+
+        const dateSelect = document.getElementById('assignedDate');
+        dateSelect.innerHTML = '';
+        const today = new Date();
+        for (let i = 0; i < 14; i++) {
+            const date = new Date(today);
+            date.setDate(today.getDate() + i);
+            const option = document.createElement('option');
+            option.value = date.toISOString().split('T')[0];
+            option.textContent = date.toLocaleDateString();
+            dateSelect.appendChild(option);
+        }
+
+        const timeSelect = document.getElementById('startingTime');
+        timeSelect.innerHTML = '';
+        for (let hour = 11; hour < 22; hour++) {
+            for (let minute = 0; minute < 60; minute += 30) {
+                const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                const option = document.createElement('option');
+                option.value = time;
+                option.textContent = time;
+                timeSelect.appendChild(option);
+            }
+        }
+    }
+
+    // Event Listeners
+    document.getElementById('closeModal').addEventListener('click', () => {
+        document.getElementById('reservationModal').classList.add('hidden');
+    });
+
     prevDayButton.addEventListener('click', () => changeDate(-1));
     nextDayButton.addEventListener('click', () => changeDate(1));
+
+    addReservationBtn.addEventListener('click', () => {
+        populateAddReservationForm();
+        addReservationModal.classList.remove('hidden');
+    });
+
+    cancelAddReservationBtn.addEventListener('click', () => {
+        addReservationModal.classList.add('hidden');
+    });
+
+    document.getElementById('reservationForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        // Here you would typically send the form data to your backend
+        console.log('Form submitted');
+        // Close the popup after submission
+        addReservationModal.classList.add('hidden');
+        // Optionally, refresh the calendar data here
+    });
 
     // Initialize the calendar when the page loads
     initializeCalendar();
